@@ -1,6 +1,6 @@
 [project]
 name = "elfrfdet"
-version = "0.1.0"
+version = "0.1.1"
 description = "Random Forest ELF malware detector — template for lolday (.text[:256] feature)"
 readme = "README.md"
 license = { text = "MIT" }
