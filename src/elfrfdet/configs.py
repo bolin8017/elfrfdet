@@ -1,0 +1,28 @@
+"""Pydantic config classes for elfrfdet stages.
+
+These classes are the typed contract between user-supplied params and the
+detector. ``maldet introspect-schema`` derives a JSON Schema from each at
+build time and embeds it in the manifest.
+"""
+
+from __future__ import annotations
+
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class _Strict(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
+class TrainConfig(_Strict):
+    n_estimators: int = Field(default=100, ge=1, description="Number of trees in the forest.")
+    max_depth: int | None = Field(default=None, ge=1, description="Maximum tree depth; None = unlimited.")
+    random_state: int = Field(default=42, description="Seed for reproducibility.")
+
+
+class EvaluateConfig(_Strict):
+    threshold: float = Field(default=0.5, ge=0.0, le=1.0, description="Decision threshold.")
+
+
+class PredictConfig(_Strict):
+    batch_size: int = Field(default=256, ge=1, description="Prediction batch size.")
