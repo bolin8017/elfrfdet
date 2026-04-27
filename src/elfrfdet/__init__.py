@@ -1,7 +1,3 @@
-"""Random Forest ELF malware detector."""
+"""elfrfdet — Random Forest ELF malware detector on the maldet 1.0 framework."""
 
-from .config import ElfRfDetectorConfig
-from .detector import ElfRfDetector
-
-__all__ = ["ElfRfDetector", "ElfRfDetectorConfig"]
-__version__ = "0.1.1"
+__version__ = "2.0.0"
