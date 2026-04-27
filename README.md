@@ -44,15 +44,15 @@ CSV with columns `file_name,label[,family]`. `file_name` is a SHA-256 hex string
 
 ## How it works
 
-1. **Feature extraction** (`src/elfrfdet/features.py::Text256Extractor`): open each ELF with `pyelftools`, read `.text.data()[:256]`, zero-pad to 256 bytes if shorter. Both the constructor *and* `get_section_by_name(...)` are wrapped in `try/except` because pyelftools lazy-parses the section-header string table — `ELFParseError` can fire on the section access, not on the `ELFFile(f)` call.
+1. **Feature extraction** (`src/elfrfdet/features.py::Text256Extractor`): open each ELF with `pyelftools`, read `.text.data()[:256]`, zero-pad to 256 bytes if shorter. All three operations — `ELFFile(f)`, `get_section_by_name(".text")`, and `section.data()` — share one `try/except` block because pyelftools lazy-parses the section-header string table; `ELFParseError` can fire on the section access (or even on `data()`), not just on the `ELFFile(f)` constructor.
 2. **Model** (`src/elfrfdet/models.py::make_rf`): `sklearn.ensemble.RandomForestClassifier`, default `n_estimators=100`.
 3. **Output**: `model/model.joblib`, `metrics.json`, `predictions.csv`, `events.jsonl` under `paths.output_dir`.
 
 ## On lolday
 
-1. Register: `POST /api/v1/detectors { git_url: "https://github.com/bolin8017/elfrfdet.git" }` — Phase 11c validator parses `maldet.toml` and creates the Detector row.
+1. Register: `POST /api/v1/detectors { git_url: "https://github.com/bolin8017/elfrfdet.git" }` — lolday's detector validator parses `maldet.toml` and creates the Detector row.
 2. Build a tag: `POST /api/v1/detectors/{id}/builds { git_tag: "v2.0.0" }`.
-3. Submit a job: `POST /api/v1/jobs { type: "train", resource_profile: "standard", ... }`. With `manifest.resources.supports = ["cpu"]`, only `standard` (cpu) jobs are accepted; multi-GPU is rejected by `validate_job_submission`.
+3. Submit a job: `POST /api/v1/jobs { type: "train", resource_profile: "standard", ... }`. With `manifest.resources.supports = ["cpu"]`, only `standard` (cpu) jobs are accepted; multi-GPU profiles are rejected by lolday's job-submission validator (CPU-only manifest).
 
 ## Migrating from v0.1.x
 
