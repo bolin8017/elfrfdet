@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.0.4] - 2026-04-27
+
+### Fixed
+
+- Pins `maldet>=1.0.6` so the runner uploads the trained model to MLflow as
+  `runs:/<run_id>/model` after `trainer.save`. Without this, lolday's
+  evaluate/predict model-fetcher init container failed to download the
+  source model artifact ("Failed to download artifacts from path 'model'")
+  because the artifact only ever existed on the train pod's emptyDir.
+
 ## [2.0.3] - 2026-04-27
 
 ### Fixed
