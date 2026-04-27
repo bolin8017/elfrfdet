@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.0.0] - 2026-04-27
+
+### BREAKING
+
+- Bumped maldet pin to `>=1.1,<2.0`. Detectors built with maldet ≤ 1.0 will not be accepted by the lolday phase11e backend (`StageSpec.config_class` and `StageSpec.params_schema` are now required).
+- Added Pydantic config classes (`TrainConfig`, `EvaluateConfig`, `PredictConfig`) at `elfrfdet.configs`. `maldet.toml` now references them via `[stages.{stage}].config_class`. `params_schema` is auto-derived at `maldet build` time via `maldet introspect-schema`.
+
+### Migration
+
+For users embedding elfrfdet:
+1. Pin `elfrfdet>=3.0.0` and `maldet[mlflow]>=1.1,<2.0`.
+2. Pass typed hyperparameters through the platform UI (lolday phase11e) — the JSON Schema is auto-derived; no manual schema upkeep.
+3. Manual override via Hydra config remains available for advanced users; the `params_schema` validation is enforced server-side.
+
 ## [2.0.6] - 2026-04-27
 
 ### Fixed
