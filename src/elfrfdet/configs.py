@@ -16,7 +16,9 @@ class _Strict(BaseModel):
 
 class TrainConfig(_Strict):
     n_estimators: int = Field(default=100, ge=1, description="Number of trees in the forest.")
-    max_depth: int | None = Field(default=None, ge=1, description="Maximum tree depth; None = unlimited.")
+    max_depth: int | None = Field(
+        default=None, ge=1, description="Maximum tree depth; None = unlimited."
+    )
     random_state: int = Field(default=42, description="Seed for reproducibility.")
 
 

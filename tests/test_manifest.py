@@ -50,18 +50,17 @@ def test_manifest_has_config_class_per_stage() -> None:
 def test_introspect_schema_for_train_config_is_valid_json_schema(tmp_path: Path) -> None:
     """Round-trip: TrainConfig → introspect-schema → JSON Schema with the right shape."""
     import json
-    import subprocess
+
+    from maldet.cli import app
+    from typer.testing import CliRunner
 
     out = tmp_path / "train_schema.json"
-    res = subprocess.run(
-        [
-            ".venv/bin/maldet", "introspect-schema",
-            "--config-class", "elfrfdet.configs:TrainConfig",
-            "--out", str(out),
-        ],
-        capture_output=True, text=True, cwd=REPO_ROOT,
+    runner = CliRunner()
+    result = runner.invoke(
+        app,
+        ["introspect-schema", "--config-class", "elfrfdet.configs:TrainConfig", "--out", str(out)],
     )
-    assert res.returncode == 0, res.stderr
+    assert result.exit_code == 0, (result.stdout, result.stderr)
     schema = json.loads(out.read_text())
     assert schema.get("additionalProperties") is False
     assert "n_estimators" in schema["properties"]
