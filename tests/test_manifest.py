@@ -12,7 +12,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 def test_manifest_loads_via_maldet() -> None:
     m = load_manifest(REPO_ROOT / "maldet.toml")
     assert m.detector.name == "elfrfdet"
-    assert m.detector.version == "2.0.0"
+    assert m.detector.version == "3.0.0"
     assert m.detector.framework == "sklearn"
 
 
@@ -34,3 +34,35 @@ def test_manifest_stages_reference_local_extractor() -> None:
     assert train.extractor == "elfrfdet.features:Text256Extractor"
     assert train.model == "elfrfdet.models:make_rf"
     assert train.trainer == "maldet.trainers.sklearn_trainer:SklearnTrainer"
+
+
+def test_manifest_has_config_class_per_stage() -> None:
+    m = load_manifest(REPO_ROOT / "maldet.toml")
+    assert m.stages["train"].config_class == "elfrfdet.configs:TrainConfig"
+    assert m.stages["evaluate"].config_class == "elfrfdet.configs:EvaluateConfig"
+    assert m.stages["predict"].config_class == "elfrfdet.configs:PredictConfig"
+    # params_schema is the placeholder — populated by `maldet build`
+    assert m.stages["train"].params_schema == {}
+    assert m.stages["evaluate"].params_schema == {}
+    assert m.stages["predict"].params_schema == {}
+
+
+def test_introspect_schema_for_train_config_is_valid_json_schema(tmp_path: Path) -> None:
+    """Round-trip: TrainConfig → introspect-schema → JSON Schema with the right shape."""
+    import json
+    import subprocess
+
+    out = tmp_path / "train_schema.json"
+    res = subprocess.run(
+        [
+            ".venv/bin/maldet", "introspect-schema",
+            "--config-class", "elfrfdet.configs:TrainConfig",
+            "--out", str(out),
+        ],
+        capture_output=True, text=True, cwd=REPO_ROOT,
+    )
+    assert res.returncode == 0, res.stderr
+    schema = json.loads(out.read_text())
+    assert schema.get("additionalProperties") is False
+    assert "n_estimators" in schema["properties"]
+    assert schema["properties"]["n_estimators"]["minimum"] == 1

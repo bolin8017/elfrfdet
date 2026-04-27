@@ -1,6 +1,6 @@
 [detector]
 name = "elfrfdet"
-version = "2.0.0"
+version = "3.0.0"
 framework = "sklearn"
 description = "Random Forest ELF malware detector — reference template for the lolday platform on the maldet 1.0 framework"
 
@@ -43,13 +43,19 @@ extractor = "elfrfdet.features:Text256Extractor"
 model = "elfrfdet.models:make_rf"
 trainer = "maldet.trainers.sklearn_trainer:SklearnTrainer"
 evaluator = "maldet.evaluators.binary:BinaryClassification"
+config_class = "elfrfdet.configs:TrainConfig"
+params_schema = {}  # placeholder; populated by maldet build
 
 [stages.evaluate]
 reader = "maldet.builtins.readers:SampleCsvReader"
 extractor = "elfrfdet.features:Text256Extractor"
 evaluator = "maldet.evaluators.binary:BinaryClassification"
+config_class = "elfrfdet.configs:EvaluateConfig"
+params_schema = {}  # placeholder; populated by maldet build
 
 [stages.predict]
 reader = "maldet.builtins.readers:SampleCsvReader"
 extractor = "elfrfdet.features:Text256Extractor"
 predictor = "maldet.builtins.predictors:BatchPredictor"
+config_class = "elfrfdet.configs:PredictConfig"
+params_schema = {}  # placeholder; populated by maldet build
