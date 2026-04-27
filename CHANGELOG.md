@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.0.6] - 2026-04-27
+
+### Fixed
+
+- Pins `maldet[mlflow]>=1.0.7` so evaluate/predict skip samples whose
+  extractor raises `ValueError` (the train path had this since 1.0.1
+  but evaluate/predict didn't). Without it, evaluate/predict crashed
+  on the first ELF sample missing `.text`.
+
 ## [2.0.5] - 2026-04-27
 
 ### Fixed
