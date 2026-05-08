@@ -89,7 +89,13 @@ def test_introspect_schema_for_evaluate_config_has_no_properties(tmp_path: Path)
     runner = CliRunner()
     result = runner.invoke(
         app,
-        ["introspect-schema", "--config-class", "elfrfdet.configs:EvaluateConfig", "--out", str(out)],
+        [
+            "introspect-schema",
+            "--config-class",
+            "elfrfdet.configs:EvaluateConfig",
+            "--out",
+            str(out),
+        ],
     )
     assert result.exit_code == 0, (result.stdout, result.stderr)
     schema = json.loads(out.read_text())
