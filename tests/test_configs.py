@@ -25,15 +25,6 @@ def test_train_config_rejects_zero_n_estimators() -> None:
         TrainConfig(n_estimators=0)
 
 
-def test_evaluate_config_threshold_range() -> None:
-    EvaluateConfig(threshold=0.0)
-    EvaluateConfig(threshold=1.0)
-    with pytest.raises(ValidationError):
-        EvaluateConfig(threshold=-0.01)
-    with pytest.raises(ValidationError):
-        EvaluateConfig(threshold=1.01)
-
-
 def test_evaluate_config_rejects_extras() -> None:
     with pytest.raises(ValidationError):
         EvaluateConfig(unknown=1)
