@@ -1,6 +1,6 @@
 [detector]
 name = "elfrfdet"
-version = "4.0.0"
+version = "4.1.0"
 framework = "sklearn"
 description = "Random Forest ELF malware detector — reference template for the lolday platform on the maldet 2.0 framework"
 
