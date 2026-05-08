@@ -10,9 +10,15 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 def test_manifest_loads_via_maldet() -> None:
+    """The manifest detector version must match the package version (single source of truth)."""
+    import tomllib
+
+    pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text())
+    expected_version = pyproject["project"]["version"]
+
     m = load_manifest(REPO_ROOT / "maldet.toml")
     assert m.detector.name == "elfrfdet"
-    assert m.detector.version == "4.1.0"
+    assert m.detector.version == expected_version
     assert m.detector.framework == "sklearn"
 
 
@@ -65,3 +71,27 @@ def test_introspect_schema_for_train_config_is_valid_json_schema(tmp_path: Path)
     assert schema.get("additionalProperties") is False
     assert "n_estimators" in schema["properties"]
     assert schema["properties"]["n_estimators"]["minimum"] == 1
+
+
+def test_introspect_schema_for_evaluate_config_has_no_properties(tmp_path: Path) -> None:
+    """Guard the v4.1.0 footgun-removal: EvaluateConfig must remain empty.
+
+    A future re-addition of threshold (or any other field) would be caught
+    here. The TrainConfig round-trip test next to this one shows the same
+    pattern for fields that legitimately exist.
+    """
+    import json
+
+    from maldet.cli import app
+    from typer.testing import CliRunner
+
+    out = tmp_path / "evaluate_schema.json"
+    runner = CliRunner()
+    result = runner.invoke(
+        app,
+        ["introspect-schema", "--config-class", "elfrfdet.configs:EvaluateConfig", "--out", str(out)],
+    )
+    assert result.exit_code == 0, (result.stdout, result.stderr)
+    schema = json.loads(out.read_text())
+    assert schema.get("additionalProperties") is False
+    assert schema.get("properties", {}) == {}, "EvaluateConfig must expose no params"
