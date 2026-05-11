@@ -1,5 +1,22 @@
 # Changelog
 
+## [4.2.0] - 2026-05-11
+
+### Changed
+
+- Bumped `maldet[mlflow]` pin to `>=2.2.1,<3.0` and `[compat] min_maldet = "2.2"` to pick up the MLflow data-model redesign:
+  - `confusion_matrix.json` and `per_class_metrics.json` as proper artifacts (no more stringified Python repr in tags)
+  - `warnings.jsonl` aggregating per-sample feature-extractor failures (no more tag overwrites)
+  - MLflow Models flavor — trained models now ship with `MLmodel` YAML, `python_env.yaml`, and an inferred signature; downstream evaluate/predict containers load via `mlflow.sklearn.load_model`
+  - Dataset lineage via `mlflow.log_input` per stage
+  - System metrics (`system/cpu_*`, `system/system_memory_*`) auto-logged via `psutil` pulled in by `maldet[mlflow]>=2.2.1`
+- No source-code changes in this repo — all behaviour changes flow from the maldet bump.
+
+### Migration
+
+- Lolday users: this detector version requires lolday running maldet-2.2-aware backend (post 2026-05-11). Older lolday backends will warn but proceed.
+- Models trained with elfrfdet 4.1.0 (raw `model.joblib`) are NOT loadable by elfrfdet 4.2.0 trainers (which expect MLflow Models layout). To migrate, retrain the model on the new version. The 4.1.0 detector image stays in lolday's Detector Version listing for legacy evaluate/predict against existing models per lolday's 2-week grace policy.
+
 ## [4.1.0] - 2026-05-08
 
 ### Removed
